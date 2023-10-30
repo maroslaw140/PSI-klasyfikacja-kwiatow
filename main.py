@@ -1,15 +1,20 @@
 import csv
-import matplotlib.pyplot as plt
-import seaborn
-import pandas
-
-from sklearn.model_selection import train_test_split
 from random import shuffle
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 
+import wykresy
+# wykresy.RysujWykresPlatka()
+# wykresy.RysujWykresKielicha()
+# wykresy.RysujHistogramDlugosciKielicha()
+# wykresy.RysujHistogramSzerokosciKielicha()
+# wykresy.RysujHistogramDlugosciPlatka()
+# wykresy.RysujHistogramSzerokosciPlatka()
 
-test_set = 0.2
-trening_set = 1 - test_set
-data = []
+test_set = 0.3
 
 # Wczytaj dane z pliku CSV i podziel je na kategorie
 with open('Iris.csv', 'r') as file:
@@ -44,8 +49,6 @@ for species, data_list in species_data.items():
     characteristics_test.extend(c_test)
     species_test.extend(s_test)
 
-    data.extend(data_list)
-
 # Wymieszaj dane treningowe
 data_train = list(zip(characteristics_train, species_train))
 shuffle(data_train)
@@ -56,122 +59,70 @@ data_test = list(zip(characteristics_test, species_test))
 shuffle(data_test)
 characteristics_test, species_test = zip(*data_test)
 
-data_frame = pandas.read_csv('Iris.csv', usecols=['SepalLengthCm', 'SepalWidthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species'])
+characteristics_train = [row[:0] + row[0 + 1:] for row in characteristics_train]
+characteristics_train = [row[:4] + row[4 + 1:] for row in characteristics_train]
+characteristics_train = [[float(value) for value in row] for row in characteristics_train]
 
-# Wykres punktowy dla długości i szerokości płatka
-seaborn.scatterplot(x="PetalLengthCm", y="PetalWidthCm", hue="Species", data=data_frame)
-plt.title("Wykres punktowy dla długości i szerokości płatka")
-# plt.savefig('./wykresy/Wykres-punktowy-platka.png')
-# plt.show()
+characteristics_test = [row[:0] + row[0 + 1:] for row in characteristics_test]
+characteristics_test = [row[:4] + row[4 + 1:] for row in characteristics_test]
+characteristics_test = [[float(value) for value in row] for row in characteristics_test]
 
-# Wykres punktowy dla długości i szerokości działki kielicha
-seaborn.scatterplot(x="SepalLengthCm", y="SepalWidthCm", hue="Species", data=data_frame)
-plt.title("Wykres punktowy dla długości i szerokości działki kielicha")
-# plt.savefig('./wykresy/Wykres-punktowy-kielicha.png')
-# plt.show()
+# K-Nearest Neighborsv algorytm
 
-# Tworzenie histogramu długości działki kielicha dla każdego gatunku
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+n_neighbors = 0
+accuracy = 0
 
-    seaborn.histplot(species_data['SepalLengthCm'], kde=True, label=species)
+while accuracy < 1:
+    n_neighbors += 1
 
-    plt.title("Histogram długości działki kielicha dla różnych gatunków")
-    plt.xlabel("Długość działki kielicha (cm)")
-    plt.ylabel("Liczba próbek")
-    plt.legend()
-    # plt.savefig('./wykresy/Histogram-dlugosci-kielicha-' + species + '.png')
-    # plt.show()
+    # Inicjalizacja modelu KNN z wybraną liczbą sąsiadów
+    knn = KNeighborsClassifier(n_neighbors)
 
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+    # Trenowanie modelu na danych treningowych
+    knn.fit(characteristics_train, species_train)
 
-    seaborn.histplot(species_data['SepalLengthCm'], kde=True, label=species)
+    # Prognozowanie gatunków dla danych testowych
+    species_pred = knn.predict(characteristics_test)
 
-plt.title("Histogram długości działki kielicha dla różnych gatunków")
-plt.xlabel("Długość działki kielicha (cm)")
-plt.ylabel("Liczba próbek")
-plt.legend()
-# plt.savefig('./wykresy/Histogram-dlugosci-kielicha.png')
-# plt.show()
-# KONIEC Tworzenie histogramu długości działki kielicha dla każdego gatunku
+    # Obliczanie dokładności klasyfikacji
+    accuracy = accuracy_score(species_test, species_pred)
 
+print("KNN: Dla", n_neighbors, "sąsiadów dokładność klasyfikacji:", accuracy)
+# KONIEC K-Nearest Neighbors
 
-# Tworzenie histogramu szerokości działki kielicha dla każdego gatunku
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+# SVM
 
-    seaborn.histplot(species_data['SepalWidthCm'], kde=True, label=species)
+for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
 
-    plt.title("Histogram szerokości działki kielicha dla różnych gatunków")
-    plt.xlabel("Szerokość działki kielicha (cm)")
-    plt.ylabel("Liczba próbek")
-    plt.legend()
-    # plt.savefig('./wykresy/Histogram-szerokosci-kielicha-' + species + '.png')
-    # plt.show()
+    # Inicjalizuj model SVM
+    svm_model = SVC(kernel = kernel, C=1)
 
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+    # Trenuj model na danych treningowych
+    svm_model.fit(characteristics_train, species_train)
 
-    seaborn.histplot(species_data['SepalWidthCm'], kde=True, label=species)
+    # Prognozuj klasy dla danych testowych
+    species_pred = svm_model.predict(characteristics_test)
 
-plt.title("Histogram długości działki kielicha dla różnych gatunków")
-plt.xlabel("Szerokość działki kielicha (cm)")
-plt.ylabel("Liczba próbek")
-plt.legend()
-# plt.savefig('./wykresy/Histogram-szerokosci-kielicha.png')
-# plt.show()
-# KONIEC Tworzenie histogramu szerokości działki kielicha dla każdego gatunku
+    # Oblicz dokładność klasyfikacji
+    accuracy = accuracy_score(species_test, species_pred)
+    print("SVM",kernel,": Dokładność klasyfikacji:", accuracy)
+
+# Koniec SVM
 
 
-# Tworzenie histogramu długości płatków dla każdego gatunku
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+# Random Forests
 
-    seaborn.histplot(species_data['PetalLengthCm'], kde=True, label=species)
+# Inicjalizuj model Random Forests
+rf_model = RandomForestClassifier(n_estimators=100)
 
-    plt.title("Histogram długości płatka dla różnych gatunków")
-    plt.xlabel("Długość płatka (cm)")
-    plt.ylabel("Liczba próbek")
-    plt.legend()
-    # plt.savefig('./wykresy/Histogram-dlugosci-platka-' + species + '.png')
-    # plt.show()
+# Trenuj model na danych treningowych
+rf_model.fit(characteristics_train, species_train)
 
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
+# Prognozuj klasy dla danych testowych
+species_pred = rf_model.predict(characteristics_test)
 
-    seaborn.histplot(species_data['PetalLengthCm'], kde=True, label=species)
+# Oblicz dokładność klasyfikacji
+accuracy = accuracy_score(species_test, species_pred)
+print("RF: Dokładność klasyfikacji:", accuracy)
 
-plt.title("Histogram długości płatka dla różnych gatunków")
-plt.xlabel("Długość płatka (cm)")
-plt.ylabel("Liczba próbek")
-plt.legend()
-# plt.savefig('./wykresy/Histogram-dlugosci-platka.png')
-# plt.show()
-# KONIEC Tworzenie histogramu długości płatków dla każdego gatunku
-
-# Tworzenie histogramu szerokości płatków dla każdego gatunku
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
-
-    seaborn.histplot(species_data['PetalWidthCm'], kde=True, label=species)
-
-    plt.title("Histogram szerokości płatka dla różnych gatunków")
-    plt.xlabel("Szerokość płatka (cm)")
-    plt.ylabel("Liczba próbek")
-    plt.legend()
-    # plt.savefig('./wykresy/Histogram-szerokosci-platka-'+species+'.png')
-    # plt.show()
-
-for species in data_frame['Species'].unique():
-    species_data = data_frame[data_frame['Species'] == species]
-
-    seaborn.histplot(species_data['PetalWidthCm'], kde=True, label=species)
-
-plt.title("Histogram szerokości płatka dla różnych gatunków")
-plt.xlabel("Szerokość płatka (cm)")
-plt.ylabel("Liczba próbek")
-plt.legend()
-# plt.savefig('./wykresy/Histogram-szerokosci-platka.png')
-# plt.show()
-# KONIEC Tworzenie histogramu szerokości płatków dla każdego gatunku
+# KONIEC Random Forests
