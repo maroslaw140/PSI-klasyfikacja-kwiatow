@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_curve, auc
 
 import wykresy
 # wykresy.RysujWykresPlatka()
@@ -14,7 +14,7 @@ import wykresy
 # wykresy.RysujHistogramDlugosciPlatka()
 # wykresy.RysujHistogramSzerokosciPlatka()
 
-test_set = 0.3
+test_set = 0.2
 
 # Wczytaj dane z pliku CSV i podziel je na kategorie
 with open('Iris.csv', 'r') as file:
@@ -67,11 +67,13 @@ characteristics_test = [row[:0] + row[0 + 1:] for row in characteristics_test]
 characteristics_test = [row[:4] + row[4 + 1:] for row in characteristics_test]
 characteristics_test = [[float(value) for value in row] for row in characteristics_test]
 
+accuracy = 0
+precision = 0
+recall = 0
+
 # K-Nearest Neighborsv algorytm
 
 n_neighbors = 0
-accuracy = 0
-
 while accuracy < 1:
     n_neighbors += 1
 
@@ -86,26 +88,31 @@ while accuracy < 1:
 
     # Obliczanie dokładności klasyfikacji
     accuracy = accuracy_score(species_test, species_pred)
+    precision = precision_score(species_test, species_pred, average='micro')
+    recall = recall_score(species_test, species_pred, average='micro')
 
-print("KNN: Dla", n_neighbors, "sąsiadów dokładność klasyfikacji:", accuracy)
+print("KNN: Dla", n_neighbors, "sąsiadów dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
 # KONIEC K-Nearest Neighbors
 
 # SVM
 
 for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
-
     # Inicjalizuj model SVM
-    svm_model = SVC(kernel = kernel, C=1)
+    svm_model = SVC(kernel=kernel, C=1, probability=True)  # Dodaj probability=True
 
     # Trenuj model na danych treningowych
     svm_model.fit(characteristics_train, species_train)
 
-    # Prognozuj klasy dla danych testowych
+    # Prognozuj klasy i prawdopodobieństwa dla danych testowych
     species_pred = svm_model.predict(characteristics_test)
+    probabilities = svm_model.predict_proba(characteristics_test)[:, 1]  # Prawdopodobieństwa klasy pozytywnej
 
     # Oblicz dokładność klasyfikacji
     accuracy = accuracy_score(species_test, species_pred)
-    print("SVM",kernel,": Dokładność klasyfikacji:", accuracy)
+    precision = precision_score(species_test, species_pred, average='micro')
+    recall = recall_score(species_test, species_pred, average='micro')
+
+    print("SVM", kernel, ": Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
 
 # Koniec SVM
 
@@ -123,6 +130,8 @@ species_pred = rf_model.predict(characteristics_test)
 
 # Oblicz dokładność klasyfikacji
 accuracy = accuracy_score(species_test, species_pred)
-print("RF: Dokładność klasyfikacji:", accuracy)
+precision = precision_score(species_test, species_pred, average='micro')
+recall = recall_score(species_test, species_pred, average='micro')
+print("RF: Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
 
 # KONIEC Random Forests
