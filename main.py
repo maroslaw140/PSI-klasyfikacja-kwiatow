@@ -125,7 +125,7 @@ for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
 
     results = permutation_importance(svm_model, characteristics_test, species_test, n_repeats=30, random_state=42)
     importance = results.importances_mean
-    # wykresy.WaznoscCech(importance, ('SVM-' + kernel))
+    wykresy.WaznoscCech(importance, ('SVM-' + kernel))
 # Koniec SVM
 
 
@@ -151,6 +151,6 @@ print("RF: Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czu�
 print("RF: Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
 
 importance = rf_model.feature_importances_
-# wykresy.WaznoscCech(importance, 'Random Forest')
+wykresy.WaznoscCech(importance, 'Random Forest')
 
 # KONIEC Random Forests
