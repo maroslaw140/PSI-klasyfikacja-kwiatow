@@ -6,6 +6,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.inspection import permutation_importance
+from sklearn.model_selection import cross_val_score
 
 import wykresy
 # wykresy.RysujWykresPlatka()
@@ -72,6 +73,8 @@ accuracy = 0
 precision = 0
 recall = 0
 
+scores = 0
+
 # K-Nearest Neighborsv algorytm
 
 n_neighbors = 0
@@ -92,7 +95,10 @@ while accuracy < 1:
     precision = precision_score(species_test, species_pred, average='micro')
     recall = recall_score(species_test, species_pred, average='micro')
 
+    scores = cross_val_score(knn, characteristics_train, species_train, cv=5, scoring='accuracy')
+
 print("KNN: Dla", n_neighbors, "sąsiadów dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
+print("KNN: Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
 # KONIEC K-Nearest Neighbors
 
 # SVM
@@ -112,7 +118,10 @@ for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
     precision = precision_score(species_test, species_pred, average='micro')
     recall = recall_score(species_test, species_pred, average='micro')
 
+    scores = cross_val_score(svm_model, characteristics_train, species_train, cv=5, scoring='accuracy')
+
     print("SVM", kernel, ": Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
+    print("SVM", kernel, ": Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
 
     results = permutation_importance(svm_model, characteristics_test, species_test, n_repeats=30, random_state=42)
     importance = results.importances_mean
@@ -136,7 +145,11 @@ accuracy = accuracy_score(species_test, species_pred)
 precision = precision_score(species_test, species_pred, average='micro')
 recall = recall_score(species_test, species_pred, average='micro')
 
+scores = cross_val_score(rf_model, characteristics_train, species_train, cv=5, scoring='accuracy')
+
 print("RF: Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
+print("RF: Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
+
 importance = rf_model.feature_importances_
 # wykresy.WaznoscCech(importance, 'Random Forest')
 
