@@ -4,7 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_curve, auc
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.inspection import permutation_importance
 
 import wykresy
 # wykresy.RysujWykresPlatka()
@@ -105,7 +106,6 @@ for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
 
     # Prognozuj klasy i prawdopodobieństwa dla danych testowych
     species_pred = svm_model.predict(characteristics_test)
-    probabilities = svm_model.predict_proba(characteristics_test)[:, 1]  # Prawdopodobieństwa klasy pozytywnej
 
     # Oblicz dokładność klasyfikacji
     accuracy = accuracy_score(species_test, species_pred)
@@ -114,6 +114,9 @@ for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
 
     print("SVM", kernel, ": Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
 
+    results = permutation_importance(svm_model, characteristics_test, species_test, n_repeats=30, random_state=42)
+    importance = results.importances_mean
+    # wykresy.WaznoscCech(importance, ('SVM-' + kernel))
 # Koniec SVM
 
 
@@ -132,6 +135,9 @@ species_pred = rf_model.predict(characteristics_test)
 accuracy = accuracy_score(species_test, species_pred)
 precision = precision_score(species_test, species_pred, average='micro')
 recall = recall_score(species_test, species_pred, average='micro')
+
 print("RF: Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
+importance = rf_model.feature_importances_
+# wykresy.WaznoscCech(importance, 'Random Forest')
 
 # KONIEC Random Forests

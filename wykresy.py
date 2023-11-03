@@ -80,16 +80,15 @@ def RysujHistogramSzerokosciPlatka():
     plt.show()
 # KONIEC Tworzenie histogramu szerokości płatków dla każdego gatunku
 
-# Narysuj krzywą ROC
-def RysujKrzywaROC(fpr, tpr):
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label='Krzywa ROC')
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Krzywa ROC')
-    plt.legend(loc='lower right')
-    plt.show()
+# Stwórz wykres słupkowy ważności cech
+def WaznoscCech(importance, name):
+    cechy = ['Sepal Len', 'Sepal Wid', 'Petal Len', 'Petal Wid']
 
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(cechy)), importance)
+    plt.xticks(range(len(cechy)), cechy, rotation=45)
+    plt.xlabel('Cechy')
+    plt.ylabel('Ważność cech')
+    plt.title('Ważność cech w modelu ' + name)
+    plt.savefig('./wykresy/Waznosc-cech-' + name + '.png')
+    plt.show()
