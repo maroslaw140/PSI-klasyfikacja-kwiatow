@@ -16,14 +16,11 @@ import wykresy
 # wykresy.RysujHistogramDlugosciPlatka()
 # wykresy.RysujHistogramSzerokosciPlatka()
 
-test_set = 0.2
-
-# Wczytaj dane z pliku CSV i podziel je na kategorie
 with open('Iris.csv', 'r') as file:
     reader = csv.reader(file)
-    next(reader)  # Pomijamy nagłówek
+    next(reader)
 
-    species_data = {}  # Słownik do przechowywania danych dla każdego gatunku
+    species_data = {}
 
     for data in reader:
         species = data[5]
@@ -39,24 +36,22 @@ species_train = []
 characteristics_test = []
 species_test = []
 
+test_set = 0.2
+
 for species, data_list in species_data.items():
 
-    # Podziel dane dla każdego gatunku
     c_train, c_test, s_train, s_test = train_test_split(data_list, [species] * len(data_list), test_size=test_set, random_state=42)
 
-    # Dodaj dane do zbiorów treningowych i testowych
     characteristics_train.extend(c_train)
     species_train.extend(s_train)
 
     characteristics_test.extend(c_test)
     species_test.extend(s_test)
 
-# Wymieszaj dane treningowe
 data_train = list(zip(characteristics_train, species_train))
 shuffle(data_train)
 characteristics_train, species_train = zip(*data_train)
 
-# Wymieszaj dane testowe
 data_test = list(zip(characteristics_test, species_test))
 shuffle(data_test)
 characteristics_test, species_test = zip(*data_test)
@@ -75,22 +70,18 @@ recall = 0
 
 scores = 0
 
-# K-Nearest Neighborsv algorytm
+# K-Nearest Neighbors
 
 n_neighbors = 0
 while accuracy < 1:
     n_neighbors += 1
 
-    # Inicjalizacja modelu KNN z wybraną liczbą sąsiadów
     knn = KNeighborsClassifier(n_neighbors)
 
-    # Trenowanie modelu na danych treningowych
     knn.fit(characteristics_train, species_train)
 
-    # Prognozowanie gatunków dla danych testowych
     species_pred = knn.predict(characteristics_test)
 
-    # Obliczanie dokładności klasyfikacji
     accuracy = accuracy_score(species_test, species_pred)
     precision = precision_score(species_test, species_pred, average='micro')
     recall = recall_score(species_test, species_pred, average='micro')
@@ -99,21 +90,18 @@ while accuracy < 1:
 
 print("KNN: Dla", n_neighbors, "sąsiadów dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czułość:", recall)
 print("KNN: Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
-# KONIEC K-Nearest Neighbors
+
 
 # SVM
 
 for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
-    # Inicjalizuj model SVM
-    svm_model = SVC(kernel=kernel, C=1, probability=True)  # Dodaj probability=True
 
-    # Trenuj model na danych treningowych
+    svm_model = SVC(kernel=kernel, C=1, probability=True)
+
     svm_model.fit(characteristics_train, species_train)
 
-    # Prognozuj klasy i prawdopodobieństwa dla danych testowych
     species_pred = svm_model.predict(characteristics_test)
 
-    # Oblicz dokładność klasyfikacji
     accuracy = accuracy_score(species_test, species_pred)
     precision = precision_score(species_test, species_pred, average='micro')
     recall = recall_score(species_test, species_pred, average='micro')
@@ -125,22 +113,17 @@ for kernel in ('linear', 'poly', 'rbf', 'sigmoid'):
 
     results = permutation_importance(svm_model, characteristics_test, species_test, n_repeats=30, random_state=42)
     importance = results.importances_mean
-    wykresy.WaznoscCech(importance, ('SVM-' + kernel))
-# Koniec SVM
+    # wykresy.WaznoscCech(importance, ('SVM-' + kernel))
 
 
 # Random Forests
 
-# Inicjalizuj model Random Forests
 rf_model = RandomForestClassifier(n_estimators=100)
 
-# Trenuj model na danych treningowych
 rf_model.fit(characteristics_train, species_train)
 
-# Prognozuj klasy dla danych testowych
 species_pred = rf_model.predict(characteristics_test)
 
-# Oblicz dokładność klasyfikacji
 accuracy = accuracy_score(species_test, species_pred)
 precision = precision_score(species_test, species_pred, average='micro')
 recall = recall_score(species_test, species_pred, average='micro')
@@ -151,6 +134,4 @@ print("RF: Dokładność klasyfikacji:", accuracy, "Precyzja:", precision, "Czu�
 print("RF: Dokładność walidacji krzyżowej: %0.2f (+/- %0.2f)\n" % (scores.mean(), scores.std() * 2))
 
 importance = rf_model.feature_importances_
-wykresy.WaznoscCech(importance, 'Random Forest')
-
-# KONIEC Random Forests
+# wykresy.WaznoscCech(importance, 'Random Forest')

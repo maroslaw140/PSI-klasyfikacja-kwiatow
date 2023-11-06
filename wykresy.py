@@ -31,8 +31,6 @@ def RysujHistogramDlugosciKielicha():
     plt.legend()
     plt.savefig('./wykresy/Histogram-dlugosci-kielicha.png')
     plt.show()
-# KONIEC Tworzenie histogramu długości działki kielicha dla każdego gatunku
-
 
 # Tworzenie histogramu szerokości działki kielicha dla każdego gatunku
 def RysujHistogramSzerokosciKielicha():
@@ -47,8 +45,6 @@ def RysujHistogramSzerokosciKielicha():
     plt.legend()
     plt.savefig('./wykresy/Histogram-szerokosci-kielicha.png')
     plt.show()
-# KONIEC Tworzenie histogramu szerokości działki kielicha dla każdego gatunku
-
 
 # Tworzenie histogramu długości płatków dla każdego gatunku
 def RysujHistogramDlugosciPlatka():
@@ -78,7 +74,6 @@ def RysujHistogramSzerokosciPlatka():
     plt.legend()
     plt.savefig('./wykresy/Histogram-szerokosci-platka.png')
     plt.show()
-# KONIEC Tworzenie histogramu szerokości płatków dla każdego gatunku
 
 # Stwórz wykres słupkowy ważności cech
 def WaznoscCech(importance, name):
