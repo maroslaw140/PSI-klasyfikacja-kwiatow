@@ -11,8 +11,8 @@ Klasyfikacja kwiatów Iris za pomocą uczenia maszynowego
 8.	Optymalizacja modelu: możesz eksperymentować z różnymi technikami regularyzacji, skalowaniem danych czy technikami dostrajania hiperparametrów, takimi jak Grid Search lub Random Search.
 9.	Dokumentacja: Przygotuj dokumentację opisującą etapy procesu, parametry modelu, otrzymane wyniki i wnioski. Zadbaj o czytelną i zrozumiałą prezentację swojej pracy.
 
-Niezbędne:
-pip install scikit-learn
-pip install pandas
-pip install seaborn
-pip install matplotlib
+
+pip install scikit-learn\n
+pip install pandas\n
+pip install seaborn\n
+pip install matplotlib\n
