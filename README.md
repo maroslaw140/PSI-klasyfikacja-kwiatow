@@ -12,7 +12,7 @@ Klasyfikacja kwiatów Iris za pomocą uczenia maszynowego
 9.	Dokumentacja: Przygotuj dokumentację opisującą etapy procesu, parametry modelu, otrzymane wyniki i wnioski. Zadbaj o czytelną i zrozumiałą prezentację swojej pracy.
 
 
-pip install scikit-learn\n
-pip install pandas\n
-pip install seaborn\n
-pip install matplotlib\n
+- `pip install scikit-learn`
+- `pip install pandas`
+- `pip install seaborn`
+- `pip install matplotlib`
